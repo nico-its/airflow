@@ -8,6 +8,8 @@ AIRFLOW_VERSION="${AIRFLOW_VERSION}"
 AIRFLOW_ADMIN_USER="${AIRFLOW_ADMIN_USER}"
 AIRFLOW_ADMIN_PASSWORD="${AIRFLOW_ADMIN_PASSWORD}"
 AIRFLOW_ADMIN_EMAIL="${AIRFLOW_ADMIN_EMAIL}"
+GIT_DAGS_REPO_URL="${GIT_DAGS_REPO_URL}"
+GIT_DAGS_BRANCH="${GIT_DAGS_BRANCH}"
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -26,7 +28,8 @@ apt-get install -y \
   libffi-dev \
   curl \
   jq \
-  unzip
+  unzip \
+  git
 
 echo "=== User airflow ==="
 id airflow >/dev/null 2>&1 || useradd -m -s /bin/bash airflow
@@ -59,6 +62,7 @@ export AIRFLOW_HOME=/opt/airflow/airflow-home
 mkdir -p "$${AIRFLOW_HOME}"
 mkdir -p "$${AIRFLOW_HOME}/dags" "$${AIRFLOW_HOME}/logs" "$${AIRFLOW_HOME}/plugins"
 
+
 airflow db migrate
 
 # airflow users create \
@@ -70,6 +74,33 @@ airflow db migrate
 #   --email "${AIRFLOW_ADMIN_EMAIL}" || true
 EOF
 
+echo "=== Clone DAGs from GitLab ==="
+if [ -n "${GIT_DAGS_REPO_URL}" ]; then
+  rm -rf /opt/airflow/airflow-home/dags
+  mkdir -p /opt/airflow/airflow-home/dags
+  chown airflow:airflow /opt/airflow/airflow-home/dags
+
+  sudo -u airflow git clone \
+    --branch "${GIT_DAGS_BRANCH}" \
+    "${GIT_DAGS_REPO_URL}" \
+    /opt/airflow/airflow-home/dags
+fi
+
+cat >/usr/local/bin/airflow-dags-sync.sh <<'EOF'
+#!/bin/bash
+set -euo pipefail
+
+REPO_DIR="/opt/airflow/airflow-home/dags"
+
+if [ -d "${REPO_DIR}/.git" ]; then
+  cd "${REPO_DIR}"
+  git fetch origin
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  git reset --hard "origin/${CURRENT_BRANCH}"
+fi
+EOF
+
+chmod +x /usr/local/bin/airflow-dags-sync.sh
 echo "=== Example DAG ==="
 cat >/opt/airflow/airflow-home/dags/example_hello.py <<'EOF'
 from datetime import datetime
@@ -138,6 +169,32 @@ RestartSec=10s
 
 [Install]
 WantedBy=multi-user.target
+EOF
+
+echo "=== airflow-dag.sync ==="
+
+cat >/etc/systemd/system/airflow-dags-sync.service <<'EOF'
+[Unit]
+Description=Sync Airflow DAGs from Git
+
+[Service]
+Type=oneshot
+User=airflow
+Group=airflow
+ExecStart=/usr/local/bin/airflow-dags-sync.sh
+EOF
+
+cat >/etc/systemd/system/airflow-dags-sync.timer <<'EOF'
+[Unit]
+Description=Run Airflow DAG sync every minute
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+Unit=airflow-dags-sync.service
+
+[Install]
+WantedBy=timers.target
 EOF
 
 systemctl daemon-reload

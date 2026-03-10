@@ -44,3 +44,13 @@ variable "airflow_admin_password" {
   type        = string
   sensitive   = true
 }
+
+variable "git_dags_repo_url" {
+  description = "Votre URL du repository GitLab contenant les DAGs"
+  type        = string
+}
+
+variable "git_dags_branch" {
+  description = "Votre Branche GitLab contenant les DAGs"
+  type        = string
+}

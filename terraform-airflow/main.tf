@@ -88,6 +88,8 @@ resource "aws_instance" "airflow" {
     AIRFLOW_ADMIN_USER     = var.airflow_admin_user
     AIRFLOW_ADMIN_PASSWORD = var.airflow_admin_password
     AIRFLOW_ADMIN_EMAIL    = var.owner
+    GIT_DAGS_REPO_URL      = var.git_dags_repo_url
+    GIT_DAGS_BRANCH        = var.git_dags_branch
   })
 
   root_block_device {

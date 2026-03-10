@@ -104,7 +104,7 @@ EOF
 echo "=== airflow-webserver.service ==="
 cat >/etc/systemd/system/airflow-webserver.service <<'EOF'
 [Unit]
-Description=Apache Airflow Webserver
+Description=Apache Airflow API Server
 After=network.target
 
 [Service]
@@ -112,7 +112,7 @@ User=airflow
 Group=airflow
 EnvironmentFile=/etc/default/airflow
 WorkingDirectory=/opt/airflow
-ExecStart=/opt/airflow/venv/bin/airflow webserver --port 8080
+ExecStart=/opt/airflow/venv/bin/airflow api-server --port 8080
 Restart=always
 RestartSec=10s
 

@@ -6,4 +6,4 @@ sudo yum install terraform -y
 cd terraform-airflow
 sudo terraform init
 sudo terraform plan
-sudo terraform apply
+sudo terraform apply -y

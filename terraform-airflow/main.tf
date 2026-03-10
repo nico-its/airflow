@@ -26,7 +26,7 @@ resource "random_string" "suffix" {
 }
 
 locals {
-  subnet_id = data.aws_subnets.default_vpc_subnets.ids[0]
+  subnet_id   = data.aws_subnets.default_vpc_subnets.ids[0]
   owner_login = split("@", var.owner)[0]
 
   instance_name = "airflow-training-${local.owner_login}-${random_string.suffix.result}"
@@ -39,7 +39,7 @@ locals {
 }
 
 resource "aws_security_group" "airflow_sg" {
-  name        = "airflow-training-sg"
+  name        = "airflow-training-sg-${random_string.suffix.result}"
   description = "Security group for training Airflow EC2"
   vpc_id      = data.aws_vpc.default.id
 
@@ -126,13 +126,13 @@ resource "aws_instance" "airflow" {
   }
 
   tags = merge(local.common_tags, {
-    Name      = each.value
+    Name      = local.instance_name
     Role      = "airflow-training"
     ManagedBy = "terraform"
   })
 
   volume_tags = merge(local.common_tags, {
-    Name      = "${each.value}-root-volume"
+    Name      = "${local.instance_name}-root-volume"
     Role      = "airflow-training"
     ManagedBy = "terraform"
   })

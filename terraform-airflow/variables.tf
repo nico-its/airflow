@@ -50,8 +50,4 @@ variable "airflow_admin_password" {
   sensitive   = true
 }
 
-variable "airflow_admin_email" {
-  description = "Email admin Airflow"
-  type        = string
-  default     = var.owner
 }

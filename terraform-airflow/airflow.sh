@@ -34,8 +34,13 @@ id airflow >/dev/null 2>&1 || useradd -m -s /bin/bash airflow
 mkdir -p /opt/airflow
 chown -R airflow:airflow /opt/airflow
 
+export AIRFLOW_VERSION
+export AIRFLOW_ADMIN_USER
+export AIRFLOW_ADMIN_PASSWORD
+export AIRFLOW_ADMIN_EMAIL
+
 echo "=== Install Airflow ==="
-sudo -u airflow bash <<EOF
+sudo -u airflow -E bash <<'EOF'
 set -euo pipefail
 
 cd /opt/airflow
@@ -46,13 +51,13 @@ source /opt/airflow/venv/bin/activate
 pip install --upgrade pip setuptools wheel
 
 PYTHON_MINOR=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
-CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-$${PYTHON_MINOR}.txt"
+CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_MINOR}.txt"
 
-pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "$${CONSTRAINT_URL}"
+pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
 
 export AIRFLOW_HOME=/opt/airflow/airflow-home
-mkdir -p "$${AIRFLOW_HOME}"
-mkdir -p "$${AIRFLOW_HOME}/dags" "$${AIRFLOW_HOME}/logs" "$${AIRFLOW_HOME}/plugins"
+mkdir -p "${AIRFLOW_HOME}"
+mkdir -p "${AIRFLOW_HOME}/dags" "${AIRFLOW_HOME}/logs" "${AIRFLOW_HOME}/plugins"
 
 airflow db migrate
 
@@ -87,12 +92,13 @@ EOF
 chown airflow:airflow /opt/airflow/airflow-home/dags/example_hello.py
 
 echo "=== systemd env ==="
-cat >/etc/default/airflow <<EOF
+cat >/etc/default/airflow <<'EOF'
 AIRFLOW_HOME=/opt/airflow/airflow-home
 PATH=/opt/airflow/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 AIRFLOW__CORE__LOAD_EXAMPLES=False
 AIRFLOW__WEBSERVER__EXPOSE_CONFIG=False
 AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.session
+AIRFLOW__WEBSERVER__WEB_SERVER_HOST=0.0.0.0
 EOF
 
 echo "=== airflow-webserver.service ==="

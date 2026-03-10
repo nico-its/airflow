@@ -3,11 +3,11 @@ set -euo pipefail
 
 exec > >(tee /var/log/user-data.log | logger -t user-data ) 2>&1
 
-INSTANCE_NAME="${instance_name}"
-AIRFLOW_VERSION="${airflow_version}"
-AIRFLOW_ADMIN_USER="${airflow_admin_user}"
-AIRFLOW_ADMIN_PASSWORD="${airflow_admin_password}"
-AIRFLOW_ADMIN_EMAIL="${airflow_admin_email}"
+INSTANCE_NAME="${INSTANCE_NAME}"
+AIRFLOW_VERSION="${AIRFLOW_VERSION}"
+AIRFLOW_ADMIN_USER="${AIRFLOW_ADMIN_USER}"
+AIRFLOW_ADMIN_PASSWORD="${AIRFLOW_ADMIN_PASSWORD}"
+AIRFLOW_ADMIN_EMAIL="${AIRFLOW_ADMIN_EMAIL}"
 
 export DEBIAN_FRONTEND=noninteractive
 

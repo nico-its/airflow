@@ -4,11 +4,6 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
-variable "instance_names" {
-  description = "Liste des noms d'instances EC2 à créer"
-  type        = list(string)
-  default     = ["airflow-training-01"]
-}
 
 variable "instance_type" {
   description = "Type d'instance EC2 autorisé"

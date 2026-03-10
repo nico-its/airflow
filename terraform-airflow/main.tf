@@ -17,8 +17,19 @@ data "aws_ssm_parameter" "ubuntu_ami" {
   name = "/aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id"
 }
 
+resource "random_string" "suffix" {
+  length  = 4
+  upper   = false
+  lower   = true
+  numeric = true
+  special = false
+}
+
 locals {
   subnet_id = data.aws_subnets.default_vpc_subnets.ids[0]
+  owner_login = split("@", var.owner)[0]
+
+  instance_name = "airflow-training-${local.owner_login}-${random_string.suffix.result}"
 
   common_tags = {
     owner    = var.owner
@@ -57,12 +68,12 @@ resource "aws_security_group" "airflow_sg" {
   }
 
   tags = merge(local.common_tags, {
-    Name = "airflow-training-sg"
+    Name = "airflow-training-sg-${random_string.suffix.result}"
   })
 }
 
 resource "aws_iam_role" "ec2_ssm_role" {
-  name = "airflow-training-ec2-ssm-role"
+  name = "airflow-training-ec2-ssm-role-${random_string.suffix.result}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -86,7 +97,7 @@ resource "aws_iam_role_policy_attachment" "ssm_core" {
 }
 
 resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "airflow-training-ec2-profile"
+  name = "airflow-training-ec2-profile-${random_string.suffix.result}"
   role = aws_iam_role.ec2_ssm_role.name
 
   tags = local.common_tags
@@ -104,11 +115,11 @@ resource "aws_instance" "airflow" {
   associate_public_ip_address = true
 
   user_data = templatefile("${path.module}/airflow.sh", {
-    instance_name          = each.value
-    airflow_version        = var.airflow_version
-    airflow_admin_user     = var.airflow_admin_user
-    airflow_admin_password = var.airflow_admin_password
-    airflow_admin_email    = var.owner
+    INSTANCE_NAME          = local.instance_name
+    AIRFLOW_VERSION        = var.airflow_version
+    AIRFLOW_ADMIN_USER     = var.airflow_admin_user
+    AIRFLOW_ADMIN_PASSWORD = var.airflow_admin_password
+    AIRFLOW_ADMIN_EMAIL    = var.owner
   })
 
   root_block_device {

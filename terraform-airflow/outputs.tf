@@ -1,15 +1,11 @@
-output "instance_public_ips" {
-  value = {
-    for k, v in aws_instance.airflow : k => v.public_ip
-  }
+output "instance_name" {
+  value = aws_instance.airflow.tags["Name"]
 }
 
-output "airflow_urls" {
-  value = {
-    for k, v in aws_instance.airflow : k => "http://${v.public_ip}:8080"
-  }
+output "instance_public_ip" {
+  value = aws_instance.airflow.public_ip
 }
 
-output "instance_names" {
-  value = keys(aws_instance.airflow)
+output "airflow_url" {
+  value = "http://${aws_instance.airflow.public_ip}:8080"
 }

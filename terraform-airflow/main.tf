@@ -72,43 +72,13 @@ resource "aws_security_group" "airflow_sg" {
   })
 }
 
-resource "aws_iam_role" "ec2_ssm_role" {
-  name = "airflow-training-ec2-ssm-role-${random_string.suffix.result}"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-        Effect = "Allow"
-      }
-    ]
-  })
-
-  tags = local.common_tags
-}
-
-resource "aws_iam_role_policy_attachment" "ssm_core" {
-  role       = aws_iam_role.ec2_ssm_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "airflow-training-ec2-profile-${random_string.suffix.result}"
-  role = aws_iam_role.ec2_ssm_role.name
-
-  tags = local.common_tags
-}
-
 resource "aws_instance" "airflow" {
   ami                    = data.aws_ssm_parameter.ubuntu_ami.value
   instance_type          = var.instance_type
   subnet_id              = local.subnet_id
   vpc_security_group_ids = [aws_security_group.airflow_sg.id]
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
+
+  iam_instance_profile = "AmazonSSMRoleForInstancesQuickSetup"
 
   associate_public_ip_address = true
 

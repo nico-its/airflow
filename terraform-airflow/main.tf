@@ -104,8 +104,6 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 }
 
 resource "aws_instance" "airflow" {
-  for_each = toset(var.instance_names)
-
   ami                    = data.aws_ssm_parameter.ubuntu_ami.value
   instance_type          = var.instance_type
   subnet_id              = local.subnet_id

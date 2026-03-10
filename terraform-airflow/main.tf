@@ -108,7 +108,7 @@ resource "aws_instance" "airflow" {
     airflow_version        = var.airflow_version
     airflow_admin_user     = var.airflow_admin_user
     airflow_admin_password = var.airflow_admin_password
-    airflow_admin_email    = var.airflow_admin_email
+    airflow_admin_email    = var.owner
   })
 
   root_block_device {

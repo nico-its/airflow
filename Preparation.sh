@@ -6,4 +6,4 @@ sudo yum install terraform -y
 cd terraform-airflow
 sudo terraform init
 sudo terraform plan -out plan.tfplan
-sudo terraform apply -auto-approve
+sudo terraform apply "plan.tfplan" -auto-approve 

@@ -61,13 +61,13 @@ mkdir -p "$${AIRFLOW_HOME}/dags" "$${AIRFLOW_HOME}/logs" "$${AIRFLOW_HOME}/plugi
 
 airflow db migrate
 
-airflow users create \
-  --username "${AIRFLOW_ADMIN_USER}" \
-  --password "${AIRFLOW_ADMIN_PASSWORD}" \
-  --firstname "Airflow" \
-  --lastname "Admin" \
-  --role "Admin" \
-  --email "${AIRFLOW_ADMIN_EMAIL}" || true
+# airflow users create \
+#   --username "${AIRFLOW_ADMIN_USER}" \
+#   --password "${AIRFLOW_ADMIN_PASSWORD}" \
+#   --firstname "Airflow" \
+#   --lastname "Admin" \
+#   --role "Admin" \
+#   --email "${AIRFLOW_ADMIN_EMAIL}" || true
 EOF
 
 echo "=== Example DAG ==="
@@ -99,6 +99,7 @@ AIRFLOW__CORE__LOAD_EXAMPLES=False
 AIRFLOW__WEBSERVER__EXPOSE_CONFIG=False
 AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.session
 AIRFLOW__WEBSERVER__WEB_SERVER_HOST=0.0.0.0
+AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS=True
 EOF
 
 echo "=== airflow-webserver.service ==="

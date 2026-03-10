@@ -92,11 +92,11 @@ set -euo pipefail
 
 REPO_DIR="/opt/airflow/airflow-home/dags"
 
-if [ -d "${REPO_DIR}/.git" ]; then
-  cd "${REPO_DIR}"
+if [ -d "$${REPO_DIR}/.git" ]; then
+  cd "$${REPO_DIR}"
   git fetch origin
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  git reset --hard "origin/${CURRENT_BRANCH}"
+  git reset --hard "origin/$${CURRENT_BRANCH}"
 fi
 EOF
 

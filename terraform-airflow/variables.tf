@@ -8,7 +8,7 @@ variable "aws_region" {
 variable "instance_type" {
   description = "Type d'instance EC2 autorisé"
   type        = string
-  default     = "t2.micro"
+  default     = "t2.small"
 
   validation {
     condition     = contains(["t2.nano", "t2.micro", "t2.small", "t3.nano", "t3.micro", "t3.small"], var.instance_type)

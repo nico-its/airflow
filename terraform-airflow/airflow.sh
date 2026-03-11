@@ -124,7 +124,7 @@ echo "=== systemd env ==="
 cat >/etc/default/airflow <<'EOF'
 AIRFLOW_HOME=/opt/airflow/airflow-home
 PATH=/opt/airflow/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-AIRFLOW__CORE__LOAD_EXAMPLES=False
+AIRFLOW__CORE__LOAD_EXAMPLES=True
 AIRFLOW__WEBSERVER__EXPOSE_CONFIG=False
 AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.session
 AIRFLOW__API__HOST=0.0.0.0

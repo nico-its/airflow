@@ -87,11 +87,11 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 
 with DAG(
-    dag_id="example_hello",
+    dag_id="dag_formation",
     start_date=datetime(2025, 1, 1),
     schedule=None,
     catchup=False,
-    tags=["example"],
+    tags=["guide"],
 ) as dag:
     hello = BashOperator(
         task_id="hello",

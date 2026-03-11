@@ -1,2 +1,2 @@
-instance_type          = "t2.micro"
+instance_type          = "t2.small"
 airflow_admin_password = "admin"

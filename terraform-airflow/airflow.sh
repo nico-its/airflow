@@ -42,6 +42,16 @@ export AIRFLOW_ADMIN_USER
 export AIRFLOW_ADMIN_PASSWORD
 export AIRFLOW_ADMIN_EMAIL
 
+echo "=== SSL self-signed certificate ==="
+mkdir -p /opt/airflow/ssl
+openssl req -x509 -newkey rsa:4096 \
+  -keyout /opt/airflow/ssl/airflow.key \
+  -out /opt/airflow/ssl/airflow.crt \
+  -days 365 -nodes \
+  -subj "/CN=${INSTANCE_NAME}"
+chown -R airflow:airflow /opt/airflow/ssl
+chmod 600 /opt/airflow/ssl/airflow.key
+
 echo "=== Install Airflow ==="
 sudo -u airflow -E bash <<'EOF'
 set -euo pipefail
@@ -126,6 +136,8 @@ AIRFLOW_HOME=/opt/airflow/airflow-home
 PATH=/opt/airflow/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 AIRFLOW__CORE__LOAD_EXAMPLES=True
 AIRFLOW__WEBSERVER__EXPOSE_CONFIG=False
+AIRFLOW__WEBSERVER__WEB_SERVER_SSL_CERT=/opt/airflow/ssl/airflow.crt
+AIRFLOW__WEBSERVER__WEB_SERVER_SSL_KEY=/opt/airflow/ssl/airflow.key
 AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.session
 AIRFLOW__API__HOST=0.0.0.0
 AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS=True
@@ -142,7 +154,9 @@ User=airflow
 Group=airflow
 EnvironmentFile=/etc/default/airflow
 WorkingDirectory=/opt/airflow
-ExecStart=/opt/airflow/venv/bin/airflow api-server --port 8080
+ExecStart=/opt/airflow/venv/bin/airflow api-server --port 443
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 Restart=always
 RestartSec=10s
 

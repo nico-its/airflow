@@ -10,7 +10,8 @@
 
 ## Prérequis
 
-Avoir un répertoire git public pour renseigner son url et sa branch
+- Avoir un répertoire git public pour renseigner son url et sa branch
+- Ne pas être connecté en VPN
 
 ## Utilisation
 1. Dans votre CloudShell , lancer ces commandes : 

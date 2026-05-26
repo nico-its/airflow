@@ -7,5 +7,5 @@ output "instance_public_ip" {
 }
 
 output "airflow_url" {
-  value = "http://${aws_instance.airflow.public_ip}:8080"
+  value = "https://${aws_instance.airflow.public_ip}:443"
 }

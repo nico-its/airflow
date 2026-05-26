@@ -53,8 +53,8 @@ resource "aws_security_group" "airflow_sg" {
 
   ingress {
     description = "Airflow UI open to all for training"
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
